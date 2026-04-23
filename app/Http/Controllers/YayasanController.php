@@ -31,7 +31,7 @@ class YayasanController extends Controller
     {
         $aspirasis = Aspirasi::with(['user', 'kategori', 'submittedByAdmin', 'validatedByYayasan'])
             ->where('status', '!=', 'Menunggu')
-            ->filter($request->only(['status', 'kategori', 'tanggal']))
+            ->filter($request->only(['status', 'kategori', 'tanggal', 'tanggal_awal', 'tanggal_akhir']))
             ->latest()
             ->get();
 
@@ -46,7 +46,7 @@ class YayasanController extends Controller
             abort(404);
         }
 
-        $aspirasi->load(['user', 'kategori', 'umpanBalik.admin', 'submittedByAdmin', 'validatedByYayasan']);
+        $aspirasi->load(['user', 'kategori', 'umpanBalik.admin', 'submittedByAdmin', 'validatedByYayasan', 'logs.actor']);
 
         return view('yayasan.aspirasi.show', compact('aspirasi'));
     }
@@ -71,6 +71,18 @@ class YayasanController extends Controller
             'catatan_yayasan' => $validated['catatan_yayasan'] ?? null,
         ]);
 
+        $aspirasi->logs()->create([
+            'actor_user_id' => Auth::id(),
+            'actor_role' => Auth::user()->role,
+            'action' => $validated['status'] === 'Disetujui' ? 'disetujui_yayasan' : 'ditolak_yayasan',
+            'description' => $validated['status'] === 'Disetujui'
+                ? 'Aspirasi disetujui oleh yayasan.'
+                : 'Aspirasi ditolak oleh yayasan.',
+            'meta' => [
+                'catatan_yayasan' => $validated['catatan_yayasan'] ?? null,
+            ],
+        ]);
+
         return back()->with('success', 'Validasi aspirasi berhasil disimpan.');
     }
 
@@ -78,7 +90,7 @@ class YayasanController extends Controller
     {
         $aspirasis = Aspirasi::with(['user', 'kategori', 'submittedByAdmin', 'validatedByYayasan'])
             ->where('status', '!=', 'Menunggu')
-            ->filter($request->only(['status', 'kategori', 'tanggal']))
+            ->filter($request->only(['status', 'kategori', 'tanggal', 'tanggal_awal', 'tanggal_akhir']))
             ->latest()
             ->get();
 
@@ -91,11 +103,10 @@ class YayasanController extends Controller
     {
         $aspirasis = Aspirasi::with(['user', 'kategori', 'submittedByAdmin', 'validatedByYayasan'])
             ->where('status', '!=', 'Menunggu')
-            ->filter($request->only(['status', 'kategori', 'tanggal']))
+            ->filter($request->only(['status', 'kategori', 'tanggal', 'tanggal_awal', 'tanggal_akhir']))
             ->latest()
             ->get();
 
         return view('yayasan.laporan.cetak', compact('aspirasis'));
     }
 }
-

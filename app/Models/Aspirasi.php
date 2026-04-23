@@ -19,6 +19,7 @@ class Aspirasi extends Model
         'kategori_id',
         'judul',
         'deskripsi',
+        'foto_path',
         'status',
         'submitted_by_admin_id',
         'submitted_to_yayasan_at',
@@ -52,6 +53,11 @@ class Aspirasi extends Model
         return $this->belongsTo(User::class, 'validated_by_yayasan_id');
     }
 
+    public function logs()
+    {
+        return $this->hasMany(AspirasiLog::class)->latest();
+    }
+
     /**
      * Scope untuk memfilter aspirasi berdasarkan kriteria tertentu (Fungsi/Prosedur)
      */
@@ -68,5 +74,16 @@ class Aspirasi extends Model
         $query->when($filters['tanggal'] ?? false, function ($query, $tanggal) {
             return $query->whereDate('created_at', $tanggal);
         });
+
+        $tanggalAwal = $filters['tanggal_awal'] ?? null;
+        $tanggalAkhir = $filters['tanggal_akhir'] ?? null;
+
+        if ($tanggalAwal && $tanggalAkhir) {
+            $query->whereDate('created_at', '>=', $tanggalAwal)->whereDate('created_at', '<=', $tanggalAkhir);
+        } elseif ($tanggalAwal) {
+            $query->whereDate('created_at', '>=', $tanggalAwal);
+        } elseif ($tanggalAkhir) {
+            $query->whereDate('created_at', '<=', $tanggalAkhir);
+        }
     }
 }

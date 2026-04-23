@@ -18,7 +18,7 @@
 
     <!-- Filter Card -->
     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-        <form action="{{ route('yayasan.laporan.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <form action="{{ route('yayasan.laporan.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-5 gap-4">
             <div>
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Filter Status</label>
                 <select name="status" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all appearance-none bg-white">
@@ -39,8 +39,13 @@
                 </select>
             </div>
             <div>
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Periode Tanggal</label>
-                <input type="date" name="tanggal" value="{{ request('tanggal') }}" 
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Tanggal Awal</label>
+                <input type="date" name="tanggal_awal" value="{{ request('tanggal_awal') }}" 
+                    class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Tanggal Akhir</label>
+                <input type="date" name="tanggal_akhir" value="{{ request('tanggal_akhir') }}" 
                     class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all">
             </div>
             <div class="flex items-end space-x-2">
@@ -125,4 +130,3 @@
     </div>
 </div>
 @endsection
-

@@ -35,4 +35,3 @@ class AdminSiswaController extends Controller
         return back()->with('success', 'Akun siswa berhasil ditambahkan.');
     }
 }
-

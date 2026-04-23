@@ -21,7 +21,7 @@
                     </h2>
                 </div>
                 <div class="p-6">
-                    <form action="{{ route('siswa.aspirasi.store') }}" method="POST" class="space-y-5">
+                    <form action="{{ route('siswa.aspirasi.store') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
                         @csrf
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-1">Judul Aspirasi</label>
@@ -44,6 +44,12 @@
                             <textarea name="deskripsi" rows="4" 
                                 class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none resize-none" 
                                 placeholder="Jelaskan secara detail keluhan Anda..." required></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">Foto (Opsional)</label>
+                            <input type="file" name="foto" accept="image/png,image/jpeg"
+                                class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none bg-white">
+                            <p class="text-[11px] text-slate-400 mt-1">JPG/PNG, maksimal 2MB.</p>
                         </div>
                         <button type="submit" 
                             class="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all transform hover:-translate-y-0.5 active:translate-y-0">

@@ -12,6 +12,7 @@ class AuthController extends Controller
         if (Auth::check()) {
             return redirect()->intended('/dashboard');
         }
+
         return view('auth.login');
     }
 
@@ -31,6 +32,7 @@ class AuthController extends Controller
             if (Auth::user()->role === 'yayasan') {
                 return redirect()->intended('/yayasan/dashboard');
             }
+
             return redirect()->intended('/dashboard');
         }
 
@@ -44,6 +46,7 @@ class AuthController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
         return redirect('/login');
     }
 }

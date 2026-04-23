@@ -33,4 +33,3 @@ class YayasanAdminController extends Controller
         return back()->with('success', 'Akun admin berhasil ditambahkan.');
     }
 }
-

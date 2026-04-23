@@ -61,6 +61,15 @@
                     "{{ $aspirasi->deskripsi }}"
                 </div>
             </div>
+
+            @if($aspirasi->foto_path)
+            <div class="mt-8 space-y-3">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Foto Lampiran</p>
+                <a href="{{ asset('storage/' . $aspirasi->foto_path) }}" target="_blank" class="block">
+                    <img src="{{ asset('storage/' . $aspirasi->foto_path) }}" alt="Foto Aspirasi" class="w-full rounded-2xl border border-slate-200 shadow-sm">
+                </a>
+            </div>
+            @endif
         </div>
     </div>
 
@@ -131,6 +140,41 @@
                     </div>
                 @endif
             </div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-100 bg-slate-50 flex items-center">
+            <i class="fas fa-stream text-indigo-500 mr-2"></i>
+            <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Log Aktivitas</h2>
+        </div>
+        <div class="p-6">
+            @php
+                $logs = $aspirasi->logs->sortBy('created_at');
+            @endphp
+
+            @if($logs->count())
+                <div class="relative pl-8 space-y-5 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-100">
+                    @foreach($logs as $log)
+                        <div class="relative">
+                            <div class="absolute -left-8 mt-1 h-6 w-6 rounded-full bg-slate-100 border-4 border-white shadow-sm flex items-center justify-center">
+                                <i class="fas fa-circle text-[6px] text-slate-400"></i>
+                            </div>
+                            <p class="text-sm font-bold text-slate-800">{{ $log->description ?? $log->action }}</p>
+                            <p class="text-xs text-slate-500">
+                                {{ $log->created_at->format('d M Y, H:i') }}
+                                @if($log->actor)
+                                    · {{ $log->actor->name }} ({{ $log->actor_role }})
+                                @endif
+                            </p>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <div class="text-center py-6">
+                    <p class="text-slate-400 text-sm italic">Belum ada log aktivitas.</p>
+                </div>
+            @endif
         </div>
     </div>
 </div>

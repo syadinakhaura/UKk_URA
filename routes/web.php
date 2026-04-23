@@ -1,12 +1,12 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\AspirasiController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminSiswaController;
-use App\Http\Controllers\YayasanController;
+use App\Http\Controllers\AspirasiController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\YayasanAdminController;
+use App\Http\Controllers\YayasanController;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -25,6 +25,7 @@ Route::middleware(['auth'])->group(function () {
         if (auth()->user()->role === 'yayasan') {
             return redirect()->route('yayasan.dashboard');
         }
+
         return redirect()->route('siswa.dashboard');
     })->name('dashboard');
 

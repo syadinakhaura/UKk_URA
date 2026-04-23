@@ -15,7 +15,7 @@ class UmpanBalik extends Model
         'aspirasi_id',
         'admin_id',
         'isi_umpan_balik',
-        'progres'
+        'progres',
     ];
 
     public function aspirasi()

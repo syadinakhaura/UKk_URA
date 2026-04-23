@@ -8,7 +8,7 @@ use App\Models\UmpanBalik;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class AdminController extends Controller  
+class AdminController extends Controller
 {
     public function index()
     {
@@ -29,7 +29,7 @@ class AdminController extends Controller
     public function aspirasiList(Request $request)
     {
         $aspirasis = Aspirasi::with(['user', 'kategori'])
-            ->filter($request->only(['status', 'kategori', 'tanggal']))
+            ->filter($request->only(['status', 'kategori', 'tanggal', 'tanggal_awal', 'tanggal_akhir']))
             ->latest()
             ->get();
 
@@ -40,31 +40,44 @@ class AdminController extends Controller
 
     public function show(Aspirasi $aspirasi)
     {
-        $aspirasi->load(['user', 'kategori', 'umpanBalik.admin', 'submittedByAdmin', 'validatedByYayasan']);
+        $aspirasi->load(['user', 'kategori', 'umpanBalik.admin', 'submittedByAdmin', 'validatedByYayasan', 'logs.actor']);
+
         return view('admin.aspirasi.show', compact('aspirasi'));
     }
 
     public function storeFeedback(Request $request, Aspirasi $aspirasi)
     {
-        if (!in_array($aspirasi->status, ['Disetujui', 'Selesai'], true)) {
+        if (! in_array($aspirasi->status, ['Disetujui', 'Selesai'], true)) {
             return back()->withErrors([
                 'isi_umpan_balik' => 'Tanggapan dan progres hanya bisa diisi setelah aspirasi disetujui yayasan.',
             ]);
         }
 
-        $request->validate([
-            'isi_umpan_balik' => 'required|string',
-            'progres' => 'nullable|string|max:255',
+        $validated = $request->validate([
+            'isi_umpan_balik' => ['required', 'string'],
+            'progres' => ['nullable', 'string', 'max:255'],
         ]);
+
+        $hasFeedback = $aspirasi->umpanBalik()->exists();
 
         UmpanBalik::updateOrCreate(
             ['aspirasi_id' => $aspirasi->id],
             [
                 'admin_id' => Auth::id(),
-                'isi_umpan_balik' => $request->isi_umpan_balik,
-                'progres' => $request->progres,
+                'isi_umpan_balik' => $validated['isi_umpan_balik'],
+                'progres' => $validated['progres'] ?? null,
             ]
         );
+
+        $aspirasi->logs()->create([
+            'actor_user_id' => Auth::id(),
+            'actor_role' => Auth::user()->role,
+            'action' => $hasFeedback ? 'umpan_balik_diupdate' : 'umpan_balik_dibuat',
+            'description' => $hasFeedback ? 'Tanggapan admin diperbarui.' : 'Tanggapan admin dibuat.',
+            'meta' => [
+                'progres' => $validated['progres'] ?? null,
+            ],
+        ]);
 
         return back()->with('success', 'Umpan balik berhasil disimpan!');
     }
@@ -83,13 +96,20 @@ class AdminController extends Controller
             'submitted_to_yayasan_at' => now(),
         ]);
 
+        $aspirasi->logs()->create([
+            'actor_user_id' => Auth::id(),
+            'actor_role' => Auth::user()->role,
+            'action' => 'diajukan_ke_yayasan',
+            'description' => 'Aspirasi diajukan ke yayasan oleh admin.',
+        ]);
+
         return back()->with('success', 'Aspirasi berhasil diajukan ke yayasan.');
     }
 
     public function updateStatus(Request $request, Aspirasi $aspirasi)
     {
-        $request->validate([
-            'status' => 'required|in:Selesai',
+        $validated = $request->validate([
+            'status' => ['required', 'in:Selesai'],
         ]);
 
         if ($aspirasi->status !== 'Disetujui') {
@@ -98,7 +118,14 @@ class AdminController extends Controller
             ]);
         }
 
-        $aspirasi->update(['status' => $request->status]);
+        $aspirasi->update(['status' => $validated['status']]);
+
+        $aspirasi->logs()->create([
+            'actor_user_id' => Auth::id(),
+            'actor_role' => Auth::user()->role,
+            'action' => 'ditandai_selesai',
+            'description' => 'Aspirasi ditandai selesai oleh admin.',
+        ]);
 
         return back()->with('success', 'Status aspirasi berhasil diperbarui!');
     }
